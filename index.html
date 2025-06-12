@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Attendance Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.1) 10px,
+                rgba(255, 255, 255, 0.1) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-100px) translateY(-100px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-section {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4f46e5;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .status-btn {
+            flex: 1;
+            padding: 18px;
+            border: 2px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .status-btn:hover::before {
+            left: 100%;
+        }
+
+        .status-btn.present {
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .status-btn.present.active {
+            background: #10b981;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-btn.absent {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .status-btn.absent.active {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            font-weight: 600;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #10b981;
+            color: white;
+        }
+
+        .notification.error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 30px;
+            color: #10b981;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: none;
+            background: #ecfdf5;
+            border-radius: 12px;
+            border: 2px solid #10b981;
+            margin-top: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .setup-notice {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #f59e0b;
+        }
+
+        .setup-notice h3 {
+            margin-bottom: 10px;
+            color: #78350f;
+        }
+
+        .setup-notice code {
+            background: #fed7aa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-section {
+                padding: 30px 20px;
+            }
+            
+            .status-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> Student Attendance</h1>
+            <p>Please mark your attendance for today</p>
+        </div>
+
+        <div class="form-section">
+            <!-- Setup Instructions (Remove after setup) -->
+            <!-- <div class="setup-notice">
+                <h3>:wrench: Setup Required:</h3>
+                <p>To connect to Google Sheets, replace the <code>GOOGLE_SCRIPT_URL</code> in the JavaScript with your Google Apps Script Web App URL.</p>
+            </div> -->
+
+            <div class="form-group">
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" class="form-control" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="studentId">Student ID</label>
+                <input type="text" id="studentId" class="form-control" placeholder="Enter your student ID" required>
+            </div>
+
+            <div class="form-group">
+                <label for="className">Class</label>
+                <input type="text" id="className" class="form-control" placeholder="Enter your class" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" class="form-control" placeholder="Enter subject name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Attendance Status</label>
+                <div class="status-buttons">
+                    <div class="status-btn present" data-status="present">
+                        Present
+                    </div>
+                    <div class="status-btn absent" data-status="absent">
+                        Absent
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit-btn" onclick="submitAttendance()">
+                <div class="loading-spinner" id="loadingSpinner"></div>
+                <span id="submitText">Submit Attendance</span>
+            </button>
+
+            <div class="success-message" id="successMessage">
+                :white_check_mark: Your attendance has been recorded successfully!<br>
+                <small>Thank you for submitting your attendance.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Replace this URL with your Google Apps Script Web App URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl90_UpIiPw39BIKByuQqCItS9Mr1TJDASdaTytuTg-fVhWrmzV7h3I47nN1KqxO3R/exec';
+
+        
+        let selectedStatus = '';
+
+        // Handle status button clicks
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                selectedStatus = this.dataset.status;
+            });
+        });
+
+        async function submitAttendance() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const studentId = document.getElementById('studentId').value.trim();
+            const className = document.getElementById('className').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+
+            // Validation
+            if (!studentName || !studentId || !className || !subject || !selectedStatus) {
+                showNotification('Please fill all fields and select attendance status', 'error');
+                return;
+            }
+
+            // Check if Google Script URL is configured
+            // if (GOOGLE_SCRIPT_URL === 'url') {
+            //     showNotification('Google Sheets integration not configured. Please set up Google Apps Script.', 'error');
+            //     return;
+            // }
+
+            // Show loading state
+            setLoadingState(true);
+
+            try {
+                // Prepare data
+                const attendanceData = {
+                    studentName: studentName,
+                    studentId: studentId,
+                    className: className,
+                    subject: subject,
+                    status: selectedStatus,
+                    timestamp: new Date().toLocaleString(),
+                    date: new Date().toLocaleDateString()
+                };
+
+                // Send to Google Sheets
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(attendanceData)
+                });
+
+                // Since we're using no-cors mode, we can't read the response
+                // We'll assume success if no error is thrown
+                showSuccessMessage();
+                clearForm();
+                showNotification('Attendance submitted successfully!', 'success');
+
+            } catch (error) {
+                console.error('Error submitting attendance:', error);
+                showNotification('Failed to submit attendance. Please try again.', 'error');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function setLoadingState(loading) {
+            const btn = document.querySelector('.submit-btn');
+            const spinner = document.getElementById('loadingSpinner');
+            const text = document.getElementById('submitText');
+
+            if (loading) {
+                btn.disabled = true;
+                spinner.style.display = 'inline-block';
+                text.textContent = 'Submitting...';
+            } else {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                text.textContent = 'Submit Attendance';
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentId').value = '';
+            document.getElementById('className').value = '';
+            document.getElementById('subject').value = '';
+            document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active'));
+            selectedStatus = '';
+        }
+
+        function showSuccessMessage() {
+            const successMsg = document.getElementById('successMessage');
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 5000);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Enter key support for form submission
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitAttendance();
+            }
+        });
+
+        // Auto-focus first field
+        window.onload = function() {
+            document.getElementById('studentName').focus();
+        };
+    </script>
+</body>
+</html>
