@@ -377,9 +377,7 @@
 
         async function submitAttendance() {
             const studentName = document.getElementById('studentName').value.trim();
-            // const studentId = document.getElementById('studentId').value.trim();
-            // const className = document.getElementById('className').value.trim();
-            // const subject = document.getElementById('subject').value.trim();
+         
 
             // Validation
             if (!studentName  || !selectedStatus) {
@@ -387,11 +385,6 @@
                 return;
             }
 
-            // Check if Google Script URL is configured
-            // if (GOOGLE_SCRIPT_URL === 'url') {
-            //     showNotification('Google Sheets integration not configured. Please set up Google Apps Script.', 'error');
-            //     return;
-            // }
 
             // Show loading state
             setLoadingState(true);
@@ -400,9 +393,7 @@
                 // Prepare data
                 const attendanceData = {
                     studentName: studentName,
-                    // studentId: studentId,
-                    // className: className,
-                    // subject: subject,
+                    
                     status: selectedStatus,
                     timestamp: new Date().toLocaleString(),
                     date: new Date().toLocaleDateString()
