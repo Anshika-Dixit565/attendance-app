@@ -377,12 +377,12 @@
 
         async function submitAttendance() {
             const studentName = document.getElementById('studentName').value.trim();
-            const studentId = document.getElementById('studentId').value.trim();
-            const className = document.getElementById('className').value.trim();
-            const subject = document.getElementById('subject').value.trim();
+            // const studentId = document.getElementById('studentId').value.trim();
+            // const className = document.getElementById('className').value.trim();
+            // const subject = document.getElementById('subject').value.trim();
 
             // Validation
-            if (!studentName || !studentId || !className || !subject || !selectedStatus) {
+            if (!studentName  || !selectedStatus) {
                 showNotification('Please fill all fields and select attendance status', 'error');
                 return;
             }
@@ -400,9 +400,9 @@
                 // Prepare data
                 const attendanceData = {
                     studentName: studentName,
-                    studentId: studentId,
-                    className: className,
-                    subject: subject,
+                    // studentId: studentId,
+                    // className: className,
+                    // subject: subject,
                     status: selectedStatus,
                     timestamp: new Date().toLocaleString(),
                     date: new Date().toLocaleDateString()
@@ -450,9 +450,7 @@
 
         function clearForm() {
             document.getElementById('studentName').value = '';
-            document.getElementById('studentId').value = '';
-            document.getElementById('className').value = '';
-            document.getElementById('subject').value = '';
+         
             document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active'));
             selectedStatus = '';
         }
